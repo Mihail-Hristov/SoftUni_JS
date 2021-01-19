@@ -18,7 +18,7 @@ function solve(arr) {
 
     for (let row = 0; row < arr.length; row++) {
         let sum = 0;
-        for (let col = 0; col < arr[row].length; col++) {
+        for (let col = 0; col < arr.length; col++) {
             sum += arr[col][row];
         }
         if (sumForCheck !== sum) {
