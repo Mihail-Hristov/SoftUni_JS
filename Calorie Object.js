@@ -7,7 +7,7 @@ function solve(arr) {
 
     for (let i = 0; i < arr.length - 1; i += 2) {
         let cur = arr[i];
-        myObj.arr[i] = arr[i + 1];
+        myObj[arr[i]] = Number(arr[i + 1]);
     }
 
     console.log(myObj);
