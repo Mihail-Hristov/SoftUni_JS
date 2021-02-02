@@ -1,0 +1,23 @@
+{
+  "name": "softuni_js",
+  "version": "1.0.0",
+  "main": " Positive Numbers .js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mihail-Hristov/SoftUni_JS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mihail-Hristov/SoftUni_JS/issues"
+  },
+  "homepage": "https://github.com/Mihail-Hristov/SoftUni_JS#readme",
+  "description": "",
+  "dependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1"
+  }
+}
