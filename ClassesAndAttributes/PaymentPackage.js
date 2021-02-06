@@ -63,6 +63,8 @@ class PaymentPackage {
 
 let instance = new PaymentPackage('Name', 100);
 
+module.exports = PaymentPackage;
+
 try {
     const hrPack = new PaymentPackage('HR Services');
 } catch (err) {
