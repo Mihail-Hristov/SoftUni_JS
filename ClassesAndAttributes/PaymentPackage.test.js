@@ -82,6 +82,13 @@ describe('testPaymentPackage', () => {
             }
             expect(inst).to.throw(Error, 'Value must be a non-negative number');
         });
+        it('testSetValueWithNegativeNumber', () => {
+            let inst = function () {
+                let newInst = new PaymentPackage('Name', 100);
+                newInst.value = 0;
+            }
+            expect(inst).to.not.throw(Error, 'Value must be a non-negative number');
+        });
         it('testSetNumberWithNonNumber', () => {
             let inst = function () {
                 let newInst = new PaymentPackage('Name', 100);
