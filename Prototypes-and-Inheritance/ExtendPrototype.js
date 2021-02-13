@@ -1,6 +1,20 @@
 function extendProrotype(classToExtend) {
-    classToExtend.prototype.species = 'Human';
-    classToExtend.prototype.toSpeciesString = function () {
-        return `I am a ${this.species}. ${this.toString()}`;
-    }
+
+    let proto = {};
+
+    let init = Object.create(proto);
+
+    init.extend = function (temp) {
+
+        Object.entries(temp).forEach(([key, value]) => {
+            if (typeof value === 'function') {
+                proto[key] = value;
+            }else {
+                init[key] = value;
+            }
+        })
+        
+    };
+
+    return init;
 }
