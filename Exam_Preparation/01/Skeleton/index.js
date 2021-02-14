@@ -25,7 +25,8 @@ function solve() {
             li.className = 'flex';
 
             let h4 = document.createElement('h4');
-            h4.textContent = `${name} - ${date}`;
+
+            h4.textContent = `${name} - ${(date.split('-').join('/').split('T').join(' - '))}`;
 
             let delBtn = document.createElement('button');
             delBtn.className = 'red';
@@ -54,9 +55,10 @@ function solve() {
                     let currentMod = el.firstChild.textContent.split('-')[0];
                     if (currentMod === module.toUpperCase()) {
                         div = el;
-                        let lis = el.getElementsByTagName('li');
+                        let lis = div.getElementsByTagName('li');
                         [].slice.call(lis).sort((a, b) => a.firstChild.textContent.localeCompare(b.firstChild.textContent))
                         .forEach((val, index) => ul.appendChild(val));
+                        div.lastChild.remove();
                         div.appendChild(ul);
                         break;
                     }
@@ -73,8 +75,8 @@ function solve() {
 
 function del(ev) {
     if (ev.target.localName === 'button') {
-        if (ev.target.parentNode.parentNode.parentNode.childNodes.length > 2) {
-            ev.target.parentNode.parentNode.remove();
+        if (ev.target.parentNode.parentNode.childNodes.length > 1) {
+            ev.target.parentNode.remove();
         } else {
             let forDel = ev.target.parentNode.parentNode.parentNode.childNodes[0].textContent.split('-')[0];
             ev.target.parentNode.parentNode.parentNode.remove();
