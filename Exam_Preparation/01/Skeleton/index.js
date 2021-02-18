@@ -1,91 +1,108 @@
 function solve() {
-    let addBtn = document.querySelector('button');
-    let trainingArea = document.querySelector('.user-view :last-child');
+    const addBtn = document.querySelector('.admin-view button');
+    const modules = document.querySelector('.modules');
+   
+    modules.addEventListener('click', del);
+    addBtn.addEventListener('click', addCourse);
 
-    trainingArea.addEventListener('click', del);
+    function addCourse(e) {
+        e.preventDefault();
 
-    let divs = [];
+        let name = document.querySelector('[name=lecture-name]').value;
+        let date = document.querySelector('[name=lecture-date]').value;
+        let module = (document.querySelector('[name=lecture-module]').value).toUpperCase() + '-MODULE';
 
-    console.log(trainingArea);
+        if (!name || !date || module === 'Select module') {
+            return;
+        }
 
-    addBtn.addEventListener('click', add);
+        document.querySelector('[name=lecture-name]').value = '';
+        document.querySelector('[name=lecture-date]').value = '';
+        document.querySelector('[name=lecture-module]').value = 'Select module';
 
-    function add(ev) {
-        ev.preventDefault();
+        let time = date.split('T');
+        let newDate = time[0].split('-').join('/');
+        let cont = name + ' - ' + newDate + ' - ' + time[1];
 
-        let name = document.querySelector('[name="lecture-name"]').value;
-        let date = document.querySelector('[name="lecture-date"]').value;
-        let module = document.querySelector('[name="lecture-module"]').value;
+        let h4 = createEl('h4', cont);
+        let delBtn = createEl('button', 'Del', 'red');
 
-        if (name !== '' && date !== '' && module !== 'Select module') {
+        let li = createEl('li', undefined, 'flex');
 
-            let ul = document.createElement('ul');
+        li.appendChild(h4);
+        li.appendChild(delBtn);
 
-            let li = document.createElement('li');
-            li.className = 'flex';
+        let div;
+        let ul;
 
-            let h4 = document.createElement('h4');
-
-            h4.textContent = `${name} - ${(date.split('-').join('/').split('T').join(' - '))}`;
-
-            let delBtn = document.createElement('button');
-            delBtn.className = 'red';
-            delBtn.textContent = 'Del';
-
-            li.appendChild(h4);
-            li.appendChild(delBtn);
-
+        if (document.getElementsByClassName('modules')[0].childElementCount > 0) {
+            let divs = Array.from(document.getElementsByClassName('modules')[0].children);
+            for (const d of divs) {
+                if (d.firstElementChild.textContent === module) {
+                    ul = d.lastElementChild;
+                    ul.appendChild(li);
+                    sortLis();
+                    return;
+                }
+            }
+            ul = createEl('ul');
             ul.appendChild(li);
 
-            let div;
-            if (!divs.includes(module.toUpperCase())) {
-                divs.push(module.toUpperCase());
-                div = document.createElement('div');
-                div.className = 'module';
+            let h3 = createEl('h3', module);
 
-                let h1 = document.createElement('h3');
-                h1.textContent = `${module.toUpperCase()}-MODULE`;
-
-                div.appendChild(h1);
-                div.appendChild(ul);
-                trainingArea.appendChild(div);
-            } else {
-                let existingDivs = document.getElementsByClassName('module');
-                for (const el of existingDivs) {
-                    let currentMod = el.firstChild.textContent.split('-')[0];
-                    if (currentMod === module.toUpperCase()) {
-                        div = el;
-                        let lis = div.getElementsByTagName('li');
-                        [].slice.call(lis).sort((a, b) => a.firstChild.textContent.localeCompare(b.firstChild.textContent))
-                        .forEach((val, index) => ul.appendChild(val));
-                        div.lastChild.remove();
-                        div.appendChild(ul);
-                        break;
-                    }
-                }
-
-            }
-
-
-        document.querySelector('[name="lecture-name"]').value = '';
-        document.querySelector('[name="lecture-date"]').value = '';
-        document.querySelector('[name="lecture-module"]').value = 'Select module';
-    }
-}
-
-function del(ev) {
-    if (ev.target.localName === 'button') {
-        if (ev.target.parentNode.parentNode.childNodes.length > 1) {
-            ev.target.parentNode.remove();
+            div = createEl('div', undefined, 'module');
+            div.appendChild(h3);
+            div.appendChild(ul);
+            modules.appendChild(div)
         } else {
-            let forDel = ev.target.parentNode.parentNode.parentNode.childNodes[0].textContent.split('-')[0];
-            ev.target.parentNode.parentNode.parentNode.remove();
-            let index = divs.indexOf(forDel);
-            if (index > - 1) {
-                divs.splice(index, 1);
-            }
+            ul = createEl('ul');
+            ul.appendChild(li);
+
+            let h3 = createEl('h3', module);
+
+            div = createEl('div', undefined, 'module');
+            div.appendChild(h3);
+            div.appendChild(ul);
+            modules.appendChild(div);
+        }
+
+        sortLis();
+
+    }
+
+    function sortLis() {
+        let divs = document.querySelectorAll('.modules');
+
+        for (const div of divs) {
+            let lis = div.lastElementChild.lastElementChild.children;
+
+            Array.from(lis).sort((a, b) => a.firstElementChild.textContent.split(' - ')[1].localeCompare(b.firstElementChild.textContent.split(' - ')[1])).forEach(l => div.lastElementChild.lastElementChild.appendChild(l));
         }
     }
-}
 
+    function createEl(type, text, style) {
+        let element = document.createElement(type);
+
+        if (text) {
+            element.textContent = text;
+        }
+
+        if (style) {
+            element.className = style;
+        }
+
+        return element;
+    }
+
+    function del(ev) {
+        if(ev.target.textContent !== 'Del') {
+            return;
+        }
+
+        if (ev.target.parentNode.parentNode.childElementCount >= 2) {
+            ev.target.parentNode.remove()
+        }else {
+            ev.target.parentNode.parentNode.parentNode.remove();
+        }
+    }
 };

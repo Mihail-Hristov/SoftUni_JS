@@ -1,8 +1,9 @@
 function solution() {
-    let addBtn = document.getElementsByTagName('button')[0];
-    let listOfGifts = document.getElementsByClassName('card')[1];
-    let listOfSent = document.getElementsByClassName('card')[2].lastElementChild;
-    let listofDiscard = document.getElementsByClassName('card')[3].lastElementChild;
+    const addBtn = document.getElementsByTagName('button')[0];
+    const [gifts, sent, discard] = document.querySelectorAll('section ul');
+    
+    const listOfSent = document.getElementsByClassName('card')[2].lastElementChild;
+    const listofDiscard = document.getElementsByClassName('card')[3].lastElementChild;
 
     addBtn.addEventListener('click', add);
     listOfGifts.addEventListener('click', proceed);
@@ -11,22 +12,24 @@ function solution() {
         let giftnName = document.querySelector('[placeholder="Gift name"]').value;
         document.querySelector('[placeholder="Gift name"]').value = '';
 
-        let li = createElement('li', giftnName);
+        let li = createElement('li', giftnName, 'gift');
         let sendBtn = createElement('button', 'Send', 'sendButton');
         let discardBtn = createElement('button', 'Discard', 'discardButton');
 
         li.appendChild(sendBtn);
         li.appendChild(discardBtn);
 
+        gifts.appendChild(li);
 
-        li.className = 'gift';
-        let giftsList = document.getElementsByClassName('card')[1].lastElementChild;
-        console.log(giftsList.children);
-        giftsList.appendChild(li);
+        sortGifts();
+        
+    }
 
-        if(giftsList.childElementCount > 1) {
-        Array.from(giftsList.children).sort((a,b) => a.textContent.localeCompare(b.textContent)).forEach(li => giftsList.append(li));
-        }
+    function sortGifts() {
+        Array
+        .from(gifts.children)
+        .sort((a,b) => a.textContent.localeCompare(b.textContent))
+        .forEach(l => gifts.append(l));
     }
 
     function createElement(type, text, style) {
