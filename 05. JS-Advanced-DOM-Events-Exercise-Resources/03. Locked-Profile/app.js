@@ -18,6 +18,6 @@ function lockedProfile() {
             ev.target.parentNode.getElementsByTagName('button')[0].textContent = 'Show more';
             return;
         }
-        
+    
     }
 }

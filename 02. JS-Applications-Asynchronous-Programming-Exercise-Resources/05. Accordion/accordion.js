@@ -25,6 +25,7 @@ async function solution() {
 async function change(ev) {
     if (ev.target.textContent === 'More') {
         ev.target.textContent = 'Less';
+
         let id= ev.target.getAttribute('id');
         let divA = ev.target.parentNode.parentNode;
         let urlMore = `http://localhost:3030/jsonstore/advanced/articles/details/${id}`;
@@ -32,7 +33,7 @@ async function change(ev) {
         let data = await response.json();
     
         let p = createEl('p', data.content);
-        let divMore = createEl('div', undefined, 'extra');
+        let divMore = createEl('div', undefined);
         divMore.appendChild(p);
         divA.appendChild(divMore);
     }else {
