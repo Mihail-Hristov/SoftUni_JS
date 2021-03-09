@@ -1,4 +1,4 @@
-document.getElementById('loginForm').addEventListener('confirm', log)
+document.getElementById('loginForm').addEventListener('submit', log)
 
 async function log(ev) {
     ev.preventDefault();
@@ -32,5 +32,7 @@ async function log(ev) {
     sessionStorage.setItem('authToken', data.accessToken);
     sessionStorage.setItem('id', data._id);
 
-    
+    document.querySelector('input[name="email"]').value = '';
+    document.querySelector('input[name="password"]').value = '';
+    window.location.replace('./index.html');
 }
