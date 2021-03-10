@@ -1,20 +1,28 @@
+import { showEdit } from "./edit.js";
+import { showHome } from "./home.js";
+
 let main;
 let section;
+let movie;
 
 async function getMovieById(id) {
     let url = `http://localhost:3030/data/movies/${id}`;
     let response = await fetch(url);
     let data = await response.json();
 
+    console.log(data);
+
     return data;
+
 }
 
 function createMovieCard(movie) {
     let element = document.createElement('div');
     element.className = 'container';
+    element.setAttribute('ownerId', `${movie._ownerId}`);
 
-    element.innerHTML = 
-    ` <div class="row bg-light text-dark">
+    element.innerHTML =
+        ` <div class="row bg-light text-dark">
         <h1>Movie title: ${movie.title}</h1>
 
         <div class="col-md-8">
@@ -31,12 +39,37 @@ function createMovieCard(movie) {
         </div>
     </div>`;
 
-   return element;
+    return element;
 }
+
+async function deleteMovie(ev) {
+    ev.preventDefault();
+    let movieId = movie._id;
+
+    let url = `http://localhost:3030/data/movies/${movieId}`;
+    let token = sessionStorage.getItem('authToken')
+    let response = await fetch(url, {
+        method: 'delete',
+        headers: { 'Content-Type': 'application/json', 'X-Authorization': `${token}` },
+    })
+
+    let data = await response.json();
+
+    if (!response.ok) {
+        return alert(data.message);
+    }
+
+    showHome();
+}
+
 
 export function setupDetails(mainTarget, sectionTarget) {
     main = mainTarget;
     section = sectionTarget;
+}
+
+function edit(ev) {
+    showEdit(movie);
 }
 
 export async function showDetails(id) {
@@ -44,8 +77,20 @@ export async function showDetails(id) {
     main.innerHTML = '';
     main.appendChild(section);
 
-    let movie = await getMovieById(id);
+    movie = await getMovieById(id);
     let card = createMovieCard(movie);
-    section.appendChild(card);
-}
 
+    section.appendChild(card);
+    const deleteBtn = document.querySelector('.btn-danger');
+    deleteBtn.addEventListener('click', deleteMovie);
+
+    const editMovie = document.querySelector('.btn-warning');
+    editMovie.addEventListener('click', edit);
+
+    let btns = document.querySelectorAll('.btn');
+    if (sessionStorage.getItem('id') !== movie._ownerId) {
+        [...btns].filter(b => b.textContent == 'Delete' || b.textContent == 'Edit').forEach(b => b.style.display = 'none');
+    }else {
+        [...btns].filter(b => b.textContent == 'Like').forEach(b => b.style.display = 'none');
+    }
+}
