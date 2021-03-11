@@ -16,10 +16,24 @@ async function getMovieById(id) {
 
 }
 
-function createMovieCard(movie) {
+async function getLikes(movie) {
+    let url = `http://localhost:3030/data/likes?where=movieId%3D%22${movie._id}%22&amp;distinct=_ownerId&amp;count`;
+    let response = await fetch(url);
+    let data = await response.json();
+
+    if (!response.ok) {
+        return alert(data.message);
+    }
+
+    console.log(data.lenght);
+    return data;
+}
+
+async function createMovieCard(movie) {
     let element = document.createElement('div');
     element.className = 'container';
     element.setAttribute('ownerId', `${movie._ownerId}`);
+    let likes = await getLikes(movie);
 
     element.innerHTML =
         ` <div class="row bg-light text-dark">
@@ -35,7 +49,7 @@ function createMovieCard(movie) {
             <a class="btn btn-danger" href="#">Delete</a>
             <a class="btn btn-warning" href="#">Edit</a>
             <a class="btn btn-primary" href="#">Like</a>
-            <span class="enrolled-span">Liked 1</span>
+            <span class="enrolled-span">Liked ${likes.lenght}</span>
         </div>
     </div>`;
 
@@ -78,7 +92,7 @@ export async function showDetails(id) {
     main.appendChild(section);
 
     movie = await getMovieById(id);
-    let card = createMovieCard(movie);
+    let card = await createMovieCard(movie);
 
     section.appendChild(card);
     const deleteBtn = document.querySelector('.btn-danger');
@@ -91,6 +105,10 @@ export async function showDetails(id) {
     if (sessionStorage.getItem('id') !== movie._ownerId) {
         [...btns].filter(b => b.textContent == 'Delete' || b.textContent == 'Edit').forEach(b => b.style.display = 'none');
     }else {
+        [...btns].filter(b => b.textContent == 'Like').forEach(b => b.style.display = 'none');
+    }
+
+    if (!sessionStorage.getItem('id') || sessionStorage.getItem('id') == movie._ownerId) {
         [...btns].filter(b => b.textContent == 'Like').forEach(b => b.style.display = 'none');
     }
 }
