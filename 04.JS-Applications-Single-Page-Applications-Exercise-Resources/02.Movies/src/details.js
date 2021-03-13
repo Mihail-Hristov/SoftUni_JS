@@ -9,11 +9,7 @@ async function getMovieById(id) {
     let url = `http://localhost:3030/data/movies/${id}`;
     let response = await fetch(url);
     let data = await response.json();
-
-    console.log(data);
-
     return data;
-
 }
 
 async function getLikes(movie) {
@@ -24,8 +20,6 @@ async function getLikes(movie) {
     if (!response.ok) {
         return alert(data.message);
     }
-
-    console.log(data.lenght);
     return data;
 }
 
@@ -49,7 +43,7 @@ async function createMovieCard(movie) {
             <a class="btn btn-danger" href="#">Delete</a>
             <a class="btn btn-warning" href="#">Edit</a>
             <a class="btn btn-primary" href="#">Like</a>
-            <span class="enrolled-span">Liked ${likes.lenght}</span>
+            <span class="enrolled-span">Liked ${likes.length}</span>
         </div>
     </div>`;
 
@@ -86,6 +80,35 @@ function edit(ev) {
     showEdit(movie);
 }
 
+async function likeMovie(ev) {
+    ev.preventDefault();
+
+    let url = 'http://localhost:3030/data/likes';
+    let obj = {
+        movieId: movie._id ,
+    }
+
+    let token = sessionStorage.getItem('authToken');
+    let response = await fetch(url, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json', 'X-Authorization': `${token}` },
+        body: JSON.stringify(obj)
+    })
+
+    if(response.ok) {
+        showDetails(movie._id);
+    }
+}
+
+async function ownLike() {
+    let id = sessionStorage.getItem('id');
+    let url = `http://localhost:3030/data/likes?where=movieId%3D%22${movie._id}%22%20and%20_ownerId%3D%22${id}%22`;
+    let response = await fetch(url);
+
+    let data = await response.json();
+    return data;
+} 
+
 export async function showDetails(id) {
     section.innerHTML = '';
     main.innerHTML = '';
@@ -94,12 +117,17 @@ export async function showDetails(id) {
     movie = await getMovieById(id);
     let card = await createMovieCard(movie);
 
+    let own = await ownLike();
+
     section.appendChild(card);
     const deleteBtn = document.querySelector('.btn-danger');
     deleteBtn.addEventListener('click', deleteMovie);
 
     const editMovie = document.querySelector('.btn-warning');
     editMovie.addEventListener('click', edit);
+
+    const likeBtn = document.querySelector('.btn-primary');
+    likeBtn.addEventListener('click', likeMovie)
 
     let btns = document.querySelectorAll('.btn');
     if (sessionStorage.getItem('id') !== movie._ownerId) {
@@ -108,7 +136,8 @@ export async function showDetails(id) {
         [...btns].filter(b => b.textContent == 'Like').forEach(b => b.style.display = 'none');
     }
 
-    if (!sessionStorage.getItem('id') || sessionStorage.getItem('id') == movie._ownerId) {
+    if (!sessionStorage.getItem('id') || sessionStorage.getItem('id') == movie._ownerId || own.length > 0 ) {
         [...btns].filter(b => b.textContent == 'Like').forEach(b => b.style.display = 'none');
     }
+    ownLike();
 }
