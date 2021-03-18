@@ -1,103 +1,50 @@
-function attachEvents() {
-    const loadBtn = document.getElementById('loadBooks');
-    loadBtn.addEventListener('click', load);
+import { html, render } from '../node_modules/lit-html/lit-html.js';
 
-    const form = document.getElementById('form');
-    form.addEventListener('submit', create);
+const sectionTable = document.querySelector('#table');
+const sectionBtn = document.querySelector('#loadBtn');
+const sectionEdit = document.querySelector('#editBook');
+const sectionCreate = document.querySelector('#createBook');
 
-}
 
 async function load() {
-    let tbody = document.getElementsByTagName('tbody')[0];
-    document.getElementsByTagName('tbody')[0].innerHTML = '';
     let url = 'http://localhost:3030/jsonstore/collections/books';
 
     let response = await fetch(url);
     let data = await response.json();
 
-    console.log(data);
+    //Object.entries.forEach((key, value) => console.log(key + ' ' + value));
 
-    for (const key in data) {
-        let tr = document.createElement('tr');
-
-        let tdT = document.createElement('td');
-        tdT.textContent = data[key].title;
-
-        let tdA = document.createElement('td');
-        tdA.textContent = data[key].author;
-
-        let td = document.createElement('td');
-        let editBtn = document.createElement('button');
-        editBtn.id = key;
-        editBtn.textContent = 'Edit';
-        editBtn.addEventListener('click', edit);
-
-        let deleteBtn = document.createElement('button');
-        deleteBtn.id = key;
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.addEventListener('click', deleteBook);
-
-        td.appendChild(editBtn);
-        td.appendChild(deleteBtn);
-
-        tr.appendChild(tdT);
-        tr.appendChild(tdA);
-        tr.appendChild(td);
-
-        tbody.appendChild(tr);
-    }
+    const table = createTable(data);
+    render(table, sectionTable);
 }
 
 async function edit(ev) {
-    let form = document.getElementById('form');
-    form.firstElementChild.textContent = 'Edit FORM';
-    form.lastElementChild.textContent = 'Save';
+    ev.preventDefault();
+    const id = ev.target.id;
+ 
+    let title = document.getElementsByName('title')[0].value;
+    let author = document.getElementsByName('author')[0].value;
 
-    let id = ev.target.id;
+    if (!title || !author) {
+        alert('You must fill all fields!');
+        return;
+    }
 
-    let urlGet = `http://localhost:3030/jsonstore/collections/books/${id}`;
-    let response = await fetch(urlGet);
-    let data = await response.json();
-
-    document.getElementsByName('title')[0].value = data.title;
-    document.getElementsByName('author')[0].value = data.author;
-
-    form.lastElementChild.addEventListener('click', async function (ev) {
-        let title = document.getElementsByName('title')[0].value;
-        let author = document.getElementsByName('author')[0].value;
-
-        if (!title || !author) {
-            alert('You must fill all fields!');
-            return;
-        }
-        if (ev.target.textContent !== 'Save') {
-            return;
-        }
-
-        let obj = {
-            title,
-            author
-        }
-        let url = `http://localhost:3030/jsonstore/collections/books/${id}`;
-        let updateBook = await fetch(url, {
-            method: 'put',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(obj),
-        })
-
-        form.firstElementChild.textContent = 'FORM';
-        form.lastElementChild.textContent = 'Submit';
-        document.getElementsByName('title')[0].value = '';
-        document.getElementsByName('author')[0].value = '';
+    let obj = {
+        title,
+        author
+    }
+    let url = `http://localhost:3030/jsonstore/collections/books/${id}`;
+    let updateBook = await fetch(url, {
+        method: 'put',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(obj),
     })
-
+    load();
 }
 
 async function create(ev) {
     ev.preventDefault();
-    if (ev.target.lastElementChild.textContent !== 'Submit') {
-        return;
-    }
 
     let title = document.getElementsByName('title')[0].value;
     let author = document.getElementsByName('author')[0].value;
@@ -126,8 +73,7 @@ async function create(ev) {
 }
 
 async function deleteBook(ev) {
-    let id = ev.target.id;
-    console.log(id);
+    const id = ev.target.id;
 
     let url = `http://localhost:3030/jsonstore/collections/books/${id}`;
     let deleteB = await fetch(url, {
@@ -136,5 +82,84 @@ async function deleteBook(ev) {
 
     load();
 }
+const btn = createLoadBtn();
+render(btn, sectionBtn)
 
-attachEvents();
+const table = createTable({});
+render(table, sectionTable);
+
+const createSect = createForm();
+render(createSect, sectionCreate);
+
+
+function createLoadBtn() {
+    return html`
+    <button @click="${load}" id="loadBooks">LOAD ALL BOOKS</button>
+    `;
+}
+
+function createTable(data) {
+    return html`
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        ${Object.entries(data).map(([key, value]) => html`
+        <tr>
+                <td>${value.title}</td>
+                <td>${value.author}</td>
+                <td>
+                    <button @click="${loadtEditForm}" id="${key}">Edit</button>
+                    <button @click="${deleteBook}" id="${key}">Delete</button>
+                </td>
+            </tr>
+        `)}
+        </tbody>
+    </table>
+    `;
+}
+
+async function loadtEditForm(ev) {
+    const id = ev.target.id;
+    console.log(id);
+    let urlGet = `http://localhost:3030/jsonstore/collections/books/${id}`;
+    let response = await fetch(urlGet);
+    let data = await response.json();
+
+    console.log(data);
+    const form = createEdit(data, id);
+    sectionCreate.innerHTML = '';
+    render(form, sectionEdit)
+}
+
+function createEdit(data, id) {
+    return html`
+    <form id="edit-form">
+        <input type="hidden" name="id">
+        <h3>Edit book</h3>
+        <label>TITLE</label>
+        <input type="text" name="title" placeholder="Title...">
+        <label>AUTHOR</label>
+        <input type="text" name="author" placeholder="Author...">
+        <input @click="${edit}" id="${id}" type="submit" value="Save">
+    </form>
+    `;
+}
+
+function createForm() {
+    return html`
+    <form id="add-form">
+        <h3>Add book</h3>
+        <label>TITLE</label>
+        <input type="text" name="title" placeholder="Title...">
+        <label>AUTHOR</label>
+        <input type="text" name="author" placeholder="Author...">
+        <input @click="${create}" type="submit" value="Submit">
+    </form>
+    `;
+}
