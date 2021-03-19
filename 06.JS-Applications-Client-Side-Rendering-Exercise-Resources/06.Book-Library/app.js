@@ -12,8 +12,6 @@ async function load() {
     let response = await fetch(url);
     let data = await response.json();
 
-    //Object.entries.forEach((key, value) => console.log(key + ' ' + value));
-
     const table = createTable(data);
     render(table, sectionTable);
 }
@@ -21,9 +19,9 @@ async function load() {
 async function edit(ev) {
     ev.preventDefault();
     const id = ev.target.id;
- 
-    let title = document.getElementsByName('title')[0].value;
-    let author = document.getElementsByName('author')[0].value;
+
+    let title = document.getElementsByName('title')[1].value;
+    let author = document.getElementsByName('author')[1].value;
 
     if (!title || !author) {
         alert('You must fill all fields!');
@@ -40,6 +38,11 @@ async function edit(ev) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(obj),
     })
+
+    document.getElementsByName('title')[1].value = '';
+    document.getElementsByName('author')[1].value = '';
+    sectionEdit.style.display = 'none';
+    sectionCreate.style.display = 'block';
     load();
 }
 
@@ -82,15 +85,6 @@ async function deleteBook(ev) {
 
     load();
 }
-const btn = createLoadBtn();
-render(btn, sectionBtn)
-
-const table = createTable({});
-render(table, sectionTable);
-
-const createSect = createForm();
-render(createSect, sectionCreate);
-
 
 function createLoadBtn() {
     return html`
@@ -126,18 +120,21 @@ function createTable(data) {
 
 async function loadtEditForm(ev) {
     const id = ev.target.id;
-    console.log(id);
+
     let urlGet = `http://localhost:3030/jsonstore/collections/books/${id}`;
     let response = await fetch(urlGet);
     let data = await response.json();
 
-    console.log(data);
-    const form = createEdit(data, id);
-    sectionCreate.innerHTML = '';
+    const form = createEdit(id);
+    sectionCreate.style.display = 'none';
+
     render(form, sectionEdit)
+    document.getElementsByName('title')[1].value = data.title;
+    document.getElementsByName('author')[1].value = data.author;
+    sectionEdit.style.display = 'block';
 }
 
-function createEdit(data, id) {
+function createEdit(id) {
     return html`
     <form id="edit-form">
         <input type="hidden" name="id">
@@ -152,6 +149,7 @@ function createEdit(data, id) {
 }
 
 function createForm() {
+    console.log('create');
     return html`
     <form id="add-form">
         <h3>Add book</h3>
@@ -163,3 +161,15 @@ function createForm() {
     </form>
     `;
 }
+
+function runProgram() {
+    const btn = createLoadBtn();
+    const table = createTable({});
+    const createSect = createForm();
+
+    render(btn, sectionBtn)
+    render(table, sectionTable);
+    render(createSect, sectionCreate);
+}
+
+runProgram();
