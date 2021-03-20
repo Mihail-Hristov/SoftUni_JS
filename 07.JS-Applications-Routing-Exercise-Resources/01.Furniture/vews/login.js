@@ -1,48 +1,7 @@
-import { html, render } from "../node_modules/lit-html/lit-html.js";
-import { login as logUser } from '../app/api.js'
+import { html } from "../node_modules/lit-html/lit-html.js";
+import { login } from '../app/data.js';
 
-const body = document.querySelector('body');
-
-export async function loginPage(ctx) {
-    const container = createElement();
-    render(container, body);
-    const form = document.querySelector('form');
-    form.addEventListener('submit', login);
-
-}
-
-async function login(ev) {
-    ev.preventDefault();
-
-    const loginForm = new FormData(ev.target);
-
-    const email = loginForm.get('email');
-    const password = loginForm.get('password');
-
-    if (!email || !password) {
-        return alert('All fields must be filled!');
-    }
-
-    const user = {
-        email,
-        password
-    }
-
-    let data;
-
-    try {
-        data = await logUser(user);
-    } catch (er) {
-        return alert(er)
-    }
-
-    sessionStorage.setItem('authToken', data.accessToken);
-
-    ev.target.reset();
-}
-
-function createElement() {
-    const element = () => html`
+const loginTamplate = (onSubmit, invalidEmail, invalidPassword) => html`
     <div class="container">
     <div class="row space-top">
         <div class="col-md-12">
@@ -50,16 +9,16 @@ function createElement() {
             <p>Please fill all fields.</p>
         </div>
     </div>
-    <form>
+    <form @submit=${onSubmit}>
         <div class="row space-top">
             <div class="col-md-4">
                 <div class="form-group">
                     <label class="form-control-label" for="email">Email</label>
-                    <input class="form-control" id="email" type="text" name="email">
+                    <input class=${'form-control' + (invalidEmail ? ' is-invalid' : '')} id="email" type="text" name="email">
                 </div>
                 <div class="form-group">
                     <label class="form-control-label" for="password">Password</label>
-                    <input class="form-control" id="password" type="password" name="password">
+                    <input class=${'form-control' + (invalidPassword ? ' is-invalid' : '')} id="password" type="password" name="password">
                 </div>
                 <input type="submit" class="btn btn-primary" value="Login" />
             </div>
@@ -68,5 +27,30 @@ function createElement() {
 </div>
     `;
 
-    return element();
+export async function loginPage(ctx) {
+    ctx.render(loginTamplate(onSubmit, false, false))
+    ctx.setUserNav('login');
+
+    async function onSubmit(ev) {
+        ev.preventDefault();
+        const loginForm = new FormData(ev.target);
+
+        const email = loginForm.get('email').trim();
+        const password = loginForm.get('password').trim();
+
+        if (!email || !password) {
+            ctx.render(loginTamplate(onSubmit, email == '', password == ''));
+            return alert('All fields must be filled!');
+        }
+
+        try {
+            await login(email, password);
+        } catch {
+            return;
+        }
+
+        ctx.setUserNav('dashboard');
+        ctx.page.redirect('/');
+    }
 }
+
