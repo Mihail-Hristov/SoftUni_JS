@@ -1,5 +1,6 @@
 import { html } from '../node_modules/lit-html/lit-html.js';
 import { login } from '../src/data.js';
+import { notify } from './alert.js';
 
 const loginTemplate = (onSubmit) => html`
 <section id="login">
@@ -32,18 +33,17 @@ export function loginPage(ctx) {
         const email = loginForm.get('email');
         const password = loginForm.get('password');
 
-        if (!email || !password) {
-            return alert('All fields must be filled!');
-        }
-
         try {
-            await login(email, password);
-        } catch {
-            return;
-        }
+            if (!email || !password) {
+                throw new Error('All fields must be filled!');
+            }
 
-        ctx.setUserNav('allMemes');
-        document.querySelector('.profile').firstElementChild.textContent = `Welcome, ${email}`; 
-        ctx.page.redirect('/allMemes');
+            const user = await login(email, password);
+
+            ctx.setUserNav('allMemes');
+            ctx.page.redirect('/allMemes');
+        } catch (err) {
+            notify(err.message);
+        }
     }
 }

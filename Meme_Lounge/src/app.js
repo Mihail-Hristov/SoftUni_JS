@@ -7,7 +7,10 @@ import { homePage } from '../views/home.js';
 import { loginPage } from '../views/login.js';
 import { registerPage } from '../views/register.js';
 import { allMemesPage } from '../views/allMemes.js';
-import { detailsPage } from '../views/details.js'
+import { detailsPage } from '../views/details.js';
+import { createPage } from '../views/create.js';
+import { editPage } from '../views/edit.js';
+import { profilePage } from '../views/profile.js';
 
 window.api = api;
 
@@ -15,10 +18,10 @@ page('/',setupRender, homePage);
 page('/login',setupRender, loginPage);
 page('/register',setupRender, registerPage);
 page('/allMemes',setupRender, allMemesPage);
-//page('/create',setupRender, crestePage);
+page('/create',setupRender, createPage);
 page('/details/:id',setupRender, detailsPage);
-//page('/edit',setupRender, editPage);
-//page('/profile',setupRender, profilePage);
+page('/edit/:id',setupRender, editPage);
+page('/profile',setupRender, profilePage);
 
 const main = document.querySelector('main');
 document.getElementById('logout').addEventListener('click', logout);
@@ -48,6 +51,8 @@ function setUserNav(activate) {
     if (token) {
         document.querySelector('.user').style.display = 'block';
         document.querySelector('.guest').style.display = 'none';
+        document.querySelector('.profile').firstElementChild.textContent = `Welcome, ${sessionStorage.getItem('userEmail')}`; 
+
     }else {
         document.querySelector('.user').style.display = 'none';
         document.querySelector('.guest').style.display = 'block';

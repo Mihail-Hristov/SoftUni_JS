@@ -54,6 +54,7 @@ function setUserNav(activate) {
     if (userId) {
         document.getElementById('guest').style.display = 'none';
         document.getElementById('user').style.display = 'inline-block';
+        document.querySelector('.profile').firstElementChild.textContent = `Welcome, ${sessionStorage.getItem('userEmail')}`; 
     } else {
         document.getElementById('guest').style.display = 'inline-block';
         document.getElementById('user').style.display = 'none';

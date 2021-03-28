@@ -19,8 +19,8 @@ async function reguest(url, option) {
             return response;
         }
     } catch (err) {
-        alert(err.message);
-        throw err;
+        //alert(err.message);
+        throw new Error(err.message);
     }
 }
 
@@ -55,6 +55,8 @@ export async function login(email, password) {
     sessionStorage.setItem('authToken', result.accessToken);
     sessionStorage.setItem('userId', result._id);
     sessionStorage.setItem('userEmail', result.email);
+    sessionStorage.setItem('username', result.username);
+    sessionStorage.setItem('gender', result.gender);
 
     return result;
 }
@@ -72,6 +74,8 @@ export async function register(username, email, password, gender) {
     sessionStorage.setItem('authToken', result.accessToken);
     sessionStorage.setItem('userId', result._id);
     sessionStorage.setItem('userEmail', result.email);
+    sessionStorage.setItem('username', result.username);
+    sessionStorage.setItem('gender', result.gender);
 
     return result;
 }
@@ -82,6 +86,8 @@ export async function logout() {
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('userId');
     sessionStorage.removeItem('userEmail');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('gender');
 
     return result;
 }

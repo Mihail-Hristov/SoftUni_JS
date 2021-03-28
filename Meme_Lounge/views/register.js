@@ -1,7 +1,8 @@
 import { html } from '../node_modules/lit-html/lit-html.js';
 import { register } from '../src/data.js';
+import { notify } from './alert.js';
 
-const registerTemplate = (onSubmit) => html `
+const registerTemplate = (onSubmit) => html`
 <section id="register">
     <form @submit=${onSubmit} id="register-form">
         <div class="container">
@@ -44,22 +45,22 @@ export function registerPage(ctx) {
         const rePass = registerForm.get('repeatPass');
         const gender = registerForm.get('gender');
 
-        if (!username || !email || !password) {
-            return alert('All fields must be filled!');
-        }
+        try {
+            if (!username || !email || !password) {
+                throw new Error('All fields must be filled!');
+            }
 
-        if (password != rePass) {
-            return alert('The passwords did not match');
-        }
+            if (password != rePass) {
+                throw new Error('The passwords did not match');
+            }
 
-        try{
-            await register(username, email, password, gender);
-        }catch{
-            return;
-        }
+                await register(username, email, password, gender);
+           
 
-        ctx.setUserNav('allMemes');
-        document.querySelector('.profile').firstElementChild.textContent = `Welcome, ${email}`; 
-        ctx.page.redirect('/allMemes');
+            ctx.setUserNav('allMemes');
+            ctx.page.redirect('/allMemes');
+        } catch (err) {
+            notify(err.message);
+        }
     }
 }

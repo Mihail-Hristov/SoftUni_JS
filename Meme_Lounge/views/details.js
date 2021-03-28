@@ -1,7 +1,7 @@
 import { html } from '../node_modules/lit-html/lit-html.js';
-import { getMemeById } from '../src/data.js';
+import { getMemeById, deleteMeme } from '../src/data.js';
 
-const detailsTemplate = (data) => html`
+const detailsTemplate = (data, isOwner) => html`
 <section id="meme-details">
     <h1>Meme Title: ${data.title}</h1>
     <div class="meme-details">
@@ -15,8 +15,8 @@ const detailsTemplate = (data) => html`
             </p>
 
             <!-- Buttons Edit/Delete should be displayed only for creator of this meme  -->
-            <a class="button warning" href="/edit/${data._id}">Edit</a>
-            <button class="button danger">Delete</button>
+            <a class="button warning" style=${isOwner ? "display:inline-block" : "display:none"} href="/edit/${data._id}">Edit</a>
+            <button id="deleteBtn" class="button danger" style=${isOwner ? "display:inline-block" : "display:none"} >Delete</button>
             
         </div>
     </div>
@@ -26,6 +26,27 @@ const detailsTemplate = (data) => html`
 export async function detailsPage(ctx) {
     const id = ctx.params.id;
     const data = await getMemeById(id);
-    ctx.render(detailsTemplate(data));
+
+    const ownerId = data._ownerId;
+    const userId = sessionStorage.getItem('userId');
+
+    const isOwner = (ownerId === userId);
+
+    ctx.render(detailsTemplate(data, isOwner));
     ctx.setUserNav();
+
+    document.getElementById('deleteBtn').addEventListener('click', delMeme);
+
+    async function delMeme() {
+        const confirmed = confirm("Are you sure!");
+
+        if (confirmed) {
+            await deleteMeme(id);
+        }else {
+            return;
+        }
+        
+
+        ctx.page.redirect('/allMemes');
+    }
 }
