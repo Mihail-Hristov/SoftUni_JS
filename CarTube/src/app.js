@@ -6,12 +6,22 @@ import{ logout } from '../src/data.js'
 import { homePage } from '../views/home.js';
 import { loginPage } from '../views/login.js';
 import { registerPage } from '../views/register.js';
-import { catalogPage } from '../views/catalog.js'
+import { catalogPage } from '../views/catalog.js';
+import { createPage } from '../views/create.js';
+import { detailsPage } from '../views/details.js';
+import { editPage } from '../views/edit.js';
+import { myCarsPage } from '../views/myCars.js';
+import { searchPage } from '../views/search.js'
 
 page('/', setupRender, homePage);
 page('/login', setupRender, loginPage);
 page('/register', setupRender, registerPage);
 page('/catalog', setupRender, catalogPage);
+page('/create', setupRender, createPage);
+page('/details/:id', setupRender, detailsPage);
+page('/edit/:id', setupRender, editPage);
+page('/myCars', setupRender, myCarsPage);
+page('/search', setupRender, searchPage);
 
 
 const main = document.getElementById('site-content');

@@ -27,7 +27,7 @@ let page;
 describe('E2E tests', function () {
     // Setup
     this.timeout(DEBUG ? 120000 : 6000);
-    before(async () => browser = await chromium.launch(DEBUG ? { headless: false, slowMo } : {}));
+    before(async () => browser = await chromium.launch(DEBUG ? { headless: false, slowMo: 2000 } : {}));
     after(async () => await browser.close());
     beforeEach(async () => {
         context = await browser.newContext();
@@ -452,7 +452,7 @@ describe('E2E tests', function () {
         });
     });
 
-    describe('User Profile Page [ 10 Points ]', async () => {
+    describe.only('User Profile Page [ 10 Points ]', async () => {
 
         // Login user
         beforeEach(async () => {

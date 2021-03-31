@@ -30,5 +30,5 @@ export async function editMeme(id, data) {
 
 export async function getUserMemes() {
     const userId = sessionStorage.getItem('userId');
-    return await api.get(host + `/data/memes?where=_ownerId%3D%22${userId}%22&amp;sortBy=_createdOn%20desc`);
+    return await api.get(host + `/data/memes?where=_ownerId%3D%22${userId}%22&sortBy=_createdOn%20desc`);
 }
