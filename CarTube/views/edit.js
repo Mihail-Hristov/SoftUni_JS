@@ -49,15 +49,15 @@ export async function editPage(ctx) {
         const brand = createForm.get('brand');
         const model = createForm.get('model');
         const description = createForm.get('description');
-        const year = createForm.get('year');
+        const year = Number(createForm.get('year'));
         const imageUrl = createForm.get('imageUrl');
-        const price = createForm.get('price');
+        const price = Number(createForm.get('price'));
 
         if(!brand || !model || !description || !year || !imageUrl || !price) {
             return alert('All fields must be filled!');
         }
 
-        if(Number(year) <= 0 || Number(price) <= 0) {
+        if(year <= 0 || price <= 0) {
             return alert('The values of year and price must be positive numbers!')
         }
 

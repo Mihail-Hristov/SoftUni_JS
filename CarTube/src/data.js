@@ -32,6 +32,6 @@ export async function getCarsByUser(id) {
     return await api.get(host + `/data/cars?where=_ownerId%3D%22${id}%22&sortBy=_createdOn%20desc`);
 }
 
-export async function searchByYear(year) {
-    return await api.get(host + `/data/cars?where=year%3D{query}`);
+export async function searchByYear(query) {
+    return await api.get(host + `/data/cars?where=year%3D${query}`);
 }

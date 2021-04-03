@@ -36,6 +36,7 @@ const elementTemplate = (element) => html `
 
 export async function myCarsPage(ctx) {
     const id = sessionStorage.getItem('userId');
+    ctx.setUserNav('myLists');
 
     const data = await getCarsByUser(id);
     ctx.render(myCarsTemplate(data));

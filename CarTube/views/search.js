@@ -2,12 +2,12 @@ import { html } from '../node_modules/lit-html/lit-html.js';
 import { searchByYear } from '../src/data.js';
 
 
-const seearchTemplate = (searchFor, search) => html`
+const seearchTemplate = (searchFor, data, year) => html`
 <section id="search-cars">
     <h1>Filter by year</h1>
 
     <div class="container">
-        <input id=searchField type="text" name="search" placeholder="Enter desired production year">
+        <input id="search-input" type="text" name="search" placeholder="Enter desired production year" .value=${year}>
         <button @click=${searchFor} class="button-list">Search</button>
     </div>
 
@@ -15,39 +15,40 @@ const seearchTemplate = (searchFor, search) => html`
     <div class="listings">
 
 
-    ${search ? html`
-        
-        <div class="listing">
-            <div class="preview">
-                <img src="/images/audia3.jpg">
-            </div>
-            <h2>Audi A3</h2>
-            <div class="info">
-                <div class="data-info">
-                    <h3>Year: 2018</h3>
-                    <h3>Price: 25000 $</h3>
-                </div>
-                <div class="data-buttons">
-                    <a href="#" class="button-carDetails">Details</a>
-                </div>
-            </div>
-        </div>
-
-        
-        ${search.length == 0 ? html `<p class="no-cars"> No results.</p>` : ''};
-        ` : ''}
+    ${data == undefined ? '' : data.length > 0 ? data.map(elementTemplate): html `<p class="no-cars"> No results.</p>`}
     </div>
 </section>
 `;
 
-export function searchPage(ctx) {
-    ctx.render(seearchTemplate(searchFor));
+const elementTemplate = (element) => html`
+<div class="listing">
+            <div class="preview">
+                <img src=${element.imageUrl}>
+            </div>
+            <h2>${element.brand} ${element.model}</h2>
+            <div class="info">
+                <div class="data-info">
+                    <h3>Year: ${element.year}</h3>
+                    <h3>Price: ${element.price} $</h3>
+                </div>
+                <div class="data-buttons">
+                    <a href="/details/${element._id}" class="button-carDetails">Details</a>
+                </div>
+            </div>
+        </div>
+`;
+
+export async function searchPage(ctx) {
+    const year = Number(ctx.querystring.split('=')[1]);
+
+    const data = Number.isNaN(year) ? [] : await searchByYear(year);
+    ctx.render(seearchTemplate(searchFor,data, Number.isNaN(year) ? '' : year));
+    ctx.setUserNav('byYear');
 
     async function searchFor() {
-        const year = document.getElementById('searchField').value;
+        const query = Number(document.getElementById('search-input').value);
+        ctx.page.redirect('/search?query=' + query);
         
-        const data = await searchByYear(year);
-
-        seearchTemplate(searchFor, data);
+        
     }
 }

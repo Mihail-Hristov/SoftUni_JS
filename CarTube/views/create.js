@@ -36,6 +36,7 @@ const createTemplate = (onSubmit) => html`
 
 export function createPage(ctx) {
     ctx.render(createTemplate(onSubmit));
+    ctx.setUserNav('create');
 
     async function onSubmit(ev) {
         ev.preventDefault();
@@ -45,12 +46,12 @@ export function createPage(ctx) {
         const brand = createForm.get('brand');
         const model = createForm.get('model');
         const description = createForm.get('description');
-        const year = createForm.get('year');
+        const year = Number(createForm.get('year'));
         const imageUrl = createForm.get('imageUrl');
-        const price = createForm.get('price');
+        const price = Number(createForm.get('price'));
 
 
-        if(Number(year) <= 0 || Number(price) <= 0) {
+        if(year <= 0 || price <= 0) {
             return alert('The values of year and price must be positive numbers!')
         }
 
